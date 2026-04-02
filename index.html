@@ -29,36 +29,31 @@
     }
 
     .frame {
-      width: min(92vw, 900px);
-      aspect-ratio: 16 / 9;
+      width: 100vw;
+      height: 100vh;
       display: grid;
       place-items: center;
       background: linear-gradient(180deg, #121826 0%, #0a0f17 100%);
-      border: 4px solid #1f2a3a;
-      border-radius: 28px;
-      box-shadow:
-        0 0 0 6px rgba(255,255,255,0.03),
-        inset 0 0 40px rgba(143,247,255,0.05),
-        0 20px 60px rgba(0,0,0,0.45);
       position: relative;
       overflow: hidden;
     }
 
     .screen-wrap {
       position: relative;
-      width: min(86vw, 820px);
-      border-radius: 20px;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
-      box-shadow: inset 0 0 28px rgba(143,247,255,0.08);
+      box-shadow: inset 0 0 48px rgba(143,247,255,0.08);
     }
 
     canvas {
       display: block;
       width: 100%;
+      height: 100%;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
       background: #070a0f;
-      filter: saturate(1.05) contrast(1.08);
+      filter: saturate(1.03) contrast(1.05);
     }
 
     .screen-wrap::before {
@@ -106,13 +101,14 @@
 
     .label {
       position: absolute;
-      bottom: 16px;
-      left: 20px;
-      font-size: 12px;
+      bottom: 14px;
+      left: 16px;
+      font-size: 11px;
       letter-spacing: 0.18em;
-      color: rgba(215, 251, 255, 0.65);
+      color: rgba(215, 251, 255, 0.5);
       text-transform: uppercase;
       user-select: none;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -122,7 +118,7 @@
       <canvas id="screen" width="128" height="72"></canvas>
       <div class="scanline"></div>
     </div>
-    <div class="label">robot gaze // online</div>
+    <div class="label">robot eyes // online</div>
   </div>
 
   <script>
@@ -196,38 +192,31 @@
     }
 
     function drawEye(cx, cy, openness, browTilt) {
-      const eyeW = 28;
-      const eyeH = Math.max(3, Math.round(18 * openness));
-      const pupilW = 8;
-      const pupilH = Math.max(3, Math.round(8 * openness));
-
+      const eyeW = 40;
+      const eyeH = Math.max(5, Math.round(26 * openness));
       const eyeX = cx - eyeW / 2;
       const eyeY = cy - eyeH / 2;
 
-      const px = clamp(Math.round(state.lookX * 5), -5, 5);
-      const py = clamp(Math.round(state.lookY * 3), -3, 3);
-
       drawGlowBlock(eyeX, eyeY, eyeW, eyeH);
 
-      const pupilX = cx - pupilW / 2 + px;
-      const pupilY = cy - pupilH / 2 + py;
-      fillRect(pupilX, pupilY, pupilW, pupilH, '#070a0f');
-      fillRect(pupilX + 1, pupilY + 1, Math.max(1, pupilW - 4), Math.max(1, pupilH - 4), '#3dd8e8');
+      const highlightW = 10;
+      const highlightH = Math.max(2, Math.round(5 * openness));
+      fillRect(eyeX + 6, eyeY + 4, highlightW, highlightH, 'rgba(255,255,255,0.28)');
 
-      const browY = eyeY - 6;
-      fillRect(eyeX + 1, browY + browTilt, eyeW - 2, 2, '#8ff7ff');
+      const browY = eyeY - 5;
+      fillRect(eyeX + 4, browY + browTilt, eyeW - 8, 2, '#8ff7ff');
     }
 
     function getMoodShape() {
       switch (state.mood) {
         case 'happy':
-          return { openness: 0.82, leftBrow: 1, rightBrow: 1 };
+          return { openness: 0.95, leftBrow: 1, rightBrow: 1 };
         case 'curious':
-          return { openness: 0.95, leftBrow: -1, rightBrow: 2 };
+          return { openness: 1.0, leftBrow: -1, rightBrow: 1 };
         case 'sleepy':
-          return { openness: 0.42, leftBrow: 1, rightBrow: 1 };
+          return { openness: 0.5, leftBrow: 1, rightBrow: 1 };
         default:
-          return { openness: 0.72, leftBrow: 0, rightBrow: 0 };
+          return { openness: 0.82, leftBrow: 0, rightBrow: 0 };
       }
     }
 
@@ -291,8 +280,8 @@
         ctx.translate((Math.random() - 0.5) * 2, 0);
       }
 
-      drawEye(42, 36 + idleBob, openness, shape.leftBrow);
-      drawEye(86, 36 + idleBob, openness, shape.rightBrow);
+      drawEye(38, 36 + idleBob, openness, shape.leftBrow);
+      drawEye(90, 36 + idleBob, openness, shape.rightBrow);
 
       if (state.glitch > 0) {
         ctx.restore();
